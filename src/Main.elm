@@ -160,11 +160,9 @@ computeGameResults { input, userInput } =
                 |> List.length
 
         incorrectWords =
-            (gameInputToListPairs input userInput
+            gameInputToListPairs input userInput
                 |> List.filter (\( iWord, uiWord ) -> iWord /= uiWord)
                 |> List.length
-            )
-                - 1
     in
     { correct = correctWords, mistakes = incorrectWords }
 
