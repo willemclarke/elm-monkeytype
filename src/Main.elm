@@ -44,9 +44,14 @@ type GameState
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { gameState = Idle, input = "", userInput = "", timeRemaining = 20, correct = 0, mistakes = 0 }
+    ( defaultModel
     , Cmd.batch [ generateRandomInputCmd, Dom.focus "outermost" |> Task.attempt (always NoOp) ]
     )
+
+
+defaultModel : Model
+defaultModel =
+    { gameState = Idle, input = "", userInput = "", timeRemaining = 20, correct = 0, mistakes = 0 }
 
 
 
@@ -87,7 +92,7 @@ update msg model =
             )
 
         Retry ->
-            ( { model | gameState = Idle, userInput = "", timeRemaining = 20 }, generateRandomInputCmd )
+            ( defaultModel, generateRandomInputCmd )
 
         GenerateInput randomStrings ->
             ( { model | input = formatGeneratedInput randomStrings }, Cmd.none )
