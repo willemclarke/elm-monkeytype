@@ -71,11 +71,14 @@ update msg model =
     case msg of
         HandleKeyboardEvent userInput ->
             let
+                newUserInput =
+                    handleUserInput userInput model.userInput
+
                 { correct, mistakes } =
-                    computeGameResults model
+                    computeGameResults model.input newUserInput
             in
             ( { model
-                | userInput = handleUserInput userInput model.userInput
+                | userInput = newUserInput
                 , gameState = Playing
                 , correct = correct
                 , mistakes = mistakes
@@ -156,8 +159,8 @@ gameInputToListPairs input userInput =
     List.map2 Tuple.pair inputWords userInputWords
 
 
-computeGameResults : Model -> { correct : Int, mistakes : Int }
-computeGameResults { input, userInput } =
+computeGameResults : String -> String -> { correct : Int, mistakes : Int }
+computeGameResults input userInput =
     let
         correctWords =
             gameInputToListPairs input userInput
@@ -246,9 +249,9 @@ view model =
 viewGameStatus : Model -> Html msg
 viewGameStatus model =
     div [ class "w-full" ]
-        [ div [ class "font-extrabold text-[#d0cfc4] text-1xl" ]
+        [ div [ class "font-bold text-[#d0cfc4] text-sm" ]
             [ text <| "Status: " ++ gameStateToString model.gameState ]
-        , div [ class "font-extrabold text-[#d0cfc4] text-1xl" ]
+        , div [ class "font-bold text-[#d0cfc4] text-sm" ]
             [ text <| "Time remaining: " ++ String.fromInt model.timeRemaining ]
         ]
 
@@ -303,9 +306,9 @@ viewGameResults model =
         [ case model.gameState of
             Finished ->
                 div []
-                    [ div [ class "font-extrabold text-[#d0cfc4] text-1xl" ]
+                    [ div [ class "text-sm text-[#d0cfc4] font-extrabold" ]
                         [ text <| "Mistakes: " ++ String.fromInt model.mistakes ]
-                    , div [ class "font-extrabold text-[#d0cfc4] text-1xl" ]
+                    , div [ class "text-sm text-[#d0cfc4] font-extrabold" ]
                         [ text <| String.join "" [ "Correct: ", String.fromInt model.correct, "/", String.fromInt (List.length <| String.words model.input) ] ]
                     ]
 
@@ -337,6 +340,7 @@ retryButton gameState =
         ]
 
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
